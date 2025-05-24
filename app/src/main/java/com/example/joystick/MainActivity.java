@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (!bluetoothAdapter.isEnabled()) {
                     Toast.makeText(MainActivity.this, "Bluetooth deshabilitado", Toast.LENGTH_SHORT).show();
+                    statusText.setText("Status: Disconnected");
                     return;
                 }
 
