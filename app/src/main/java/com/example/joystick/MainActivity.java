@@ -29,13 +29,12 @@ import android.widget.TextView;
 import android.bluetooth.BluetoothAdapter;
 import android.widget.Toast;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.util.UUID;
 
 import android.os.Looper;
 import android.os.Message;
-
-
 
 
 public class MainActivity extends AppCompatActivity {
@@ -70,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
         TextView directionText = findViewById(R.id.directionText);
 
 
-
         //Connexion Bluetooth, busqueda device, estado
         BluetoothManager bluetoothManager = getSystemService(BluetoothManager.class);
         bluetoothAdapter = bluetoothManager.getAdapter();
@@ -80,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         deviceText = findViewById(R.id.deviceText);
         deviceReading = findViewById(R.id.deviceReading);
 
-        Button sendButton = findViewById(R.id.sendButton);
+        //Button sendButton = findViewById(R.id.sendButton);
 
         //definición del Handler
             uiHandler = new Handler(Looper.getMainLooper()) {
@@ -100,6 +98,10 @@ public class MainActivity extends AppCompatActivity {
                             String sentMessage = (String) msg.obj;
                             Log.d("BT_WRITE", "Mensaje enviado: " + sentMessage);
                             break;
+
+                        case MessageConstants.MESSAGE_DISCONNECTED:
+                            cleanSession();
+                            break;
                     }
                 }
             };
@@ -114,21 +116,28 @@ public class MainActivity extends AppCompatActivity {
                 coordinateText.setText(String.format("X: %.2f, Y: %.2f", xPercent, yPercent));
                 directionText.setText(direction);
 
-                //enviar al Arduino
-                if (readWriteThread != null) {
-                    String message = String.format("X%.2fY%.2f\n", xPercent, yPercent); // ejemplo: X0.75Y-0.42
-                    readWriteThread.write(message.getBytes());
+                if (!bluetoothAdapter.isEnabled() || !permissionBluetooth()) { //bluetooth está apagado o faltan permisos
+                    cleanSession();
                 }
+                else{
+                    //enviar al Arduino
+                    if (readWriteThread != null) {
+                        String message = String.format("X%.2fY%.2f\n", xPercent, yPercent); //ejemplo: X0.75Y-0.42
+                        readWriteThread.write(message.getBytes(StandardCharsets.UTF_8));
+                    }
+
+                }
+
             }
         });
-
+        /* //prueba para un led
         sendButton.setOnClickListener(v -> {
             String command = "on"; // o "off"
 
             if (readWriteThread != null) {
                 readWriteThread.write(command.getBytes());
             }
-        });
+        });*/
 
 
         //barra de estado
@@ -149,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(permisosBluetooth()) {
+                if(permissionBluetooth()) {
                     if (!bluetoothAdapter.isEnabled()) {
                         Log.d(TAG, "Bluetooth deshabilitado");
 
@@ -165,8 +174,8 @@ public class MainActivity extends AppCompatActivity {
                         for (BluetoothDevice device : pairedDevices) {
                             String deviceName = device.getName();
                             String deviceHardwareAddress = device.getAddress(); //MAC address
-                            //deviceFound= deviceFound + deviceName + " / "+deviceHardwareAddress+"\n";
-                            deviceFound= deviceFound +deviceHardwareAddress+"\n";
+                            deviceFound= deviceFound + deviceName + " / "+deviceHardwareAddress+"\n";
+                            //deviceFound= deviceFound +deviceHardwareAddress+"\n";
                             if (deviceName.equals("DESKTOP-2S48VJB")) {
                                 Log.d(TAG, "HC-05 bluetooth encontrado");
                                 standardUUID = device.getUuids()[0].getUuid();
@@ -187,48 +196,51 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     private void setupConnectButton() {
         connectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(robotBluetoothDevice==null){
-                    Toast.makeText(v.getContext(),
-                            "El Bluetooth no detecto el dispositivo",
-                            Toast.LENGTH_SHORT).show();
-                    return;
+                if (!bluetoothAdapter.isEnabled() || !permissionBluetooth()) { //bluetooth está apagado o faltan permisos
+                    cleanSession();
+                } else {
+                    //si no hay dispositivo
+                    if (robotBluetoothDevice == null) {
+                        Toast.makeText(v.getContext(),
+                                "El Bluetooth no detecto el dispositivo",
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                        //cierra hilo de lectura/escritura anterior si existe
+                        if (readWriteThread != null) {
+                            readWriteThread.cancel();
+                            readWriteThread = null;
+                        }  // Libera la referencia
+                        //flujo de conexion
+                        bluetoothConnectionStream();
+
+                    }
                 }
-                if(!bluetoothAdapter.isEnabled())
-                {
-                    deviceText.setText("");
-                    deviceReading.setText("");
-                    return;
-                }
-                //cierra cualquier conexión anterior
-                cerrarSesionBluetoothAnterior();
-                //flujo de conexion
-                bluetoothConnectionStream();
             }
         });
     }
 
     @SuppressLint("MissingPermission")
     private void bluetoothConnectionStream() {
-        // Cierra cualquier hilo de lectura/escritura anterior
-        cerrarSesionBluetoothAnterior();
-
         //lanza en un hilo de fondo la conexión
         new Thread(() -> {
             bluetoothAdapter.cancelDiscovery();//Cancelar discovery para no ralentizar la conexión
-
-
             ConnectThread ct = new ConnectThread( //intentar conectar el socket
                     robotBluetoothDevice,
                     standardUUID,
                     uiHandler        //Handler que actualiza deviceReading
             );
             currentConnectThread = ct;
-            ct.run(); //bloquea hasta conectar o fallar
+            ct.start();
+            try {
+                ct.join();  //bloquea este hilo de fondo hasta que ct.run() termine
+            } catch (InterruptedException e) {
+                Log.e(TAG, "Interrumpido esperando ConnectThread", e);
+                Thread.currentThread().interrupt();
+            }
 
             if (ct.getMmSocket() != null && ct.getMmSocket().isConnected()) {
                 runOnUiThread(() -> statusText.setText("Status: Connected"));/***********/
@@ -243,21 +255,29 @@ public class MainActivity extends AppCompatActivity {
         }, "BT-Connect-Thread").start();
 
     }
+    private void cleanSession(){
+        deviceText.setText("");
+        deviceReading.setText("");
+        statusText.setText("Status: Disconnected");
+        terminateBluetoothSession();
+    }
 
-    private void cerrarSesionBluetoothAnterior() {
+    private void terminateBluetoothSession() {
         if (readWriteThread != null) {
-            readWriteThread.cancel(); // Cierra el socket
+            readWriteThread.cancel(); //cierra el socket
             readWriteThread = null;   // Libera la referencia
         }
 
         if (currentConnectThread != null) {
-            currentConnectThread.cancel(); // Cancela intento de conexión
+            currentConnectThread.cancel();
             currentConnectThread = null;   // Libera la referencia
         }
+        //no hay un dispositivo seleccionado
+        robotBluetoothDevice = null;
     }
 
     //Verifica si hay bluetooth y si tiene los permisos, sino hace el request
-    private boolean permisosBluetooth() {
+    private boolean permissionBluetooth() {
         if (!isBluetoothAvailable()) {
             Toast.makeText(this, "Bluetooth no disponible en este dispositivo", Toast.LENGTH_SHORT).show();
             return false;
@@ -266,6 +286,7 @@ public class MainActivity extends AppCompatActivity {
             requestBluetoothPermission();
             return false;
         }
+
         Log.d(TAG, "Bluetooth disponible y permisos concedidos");
         return true;
     }
@@ -288,7 +309,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void requestBluetoothPermission() { //request de los permisos
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             //Android 12+
             ActivityCompat.requestPermissions(

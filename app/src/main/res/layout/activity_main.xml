@@ -37,7 +37,7 @@
 
         android:layout_width="match_parent"
 
-        android:layout_height="310dp"
+        android:layout_height="250dp"
         android:layout_marginStart="0dp"
         android:layout_marginTop="0dp"
         android:gravity="center"
@@ -69,6 +69,7 @@
             android:textColor="@color/white"
             android:backgroundTint="@color/hat_blue"
             />
+        <!-- prueba de boton de envio
         <Button
             android:id="@+id/sendButton"
             android:layout_width="wrap_content"
@@ -78,7 +79,7 @@
             android:text="Send"
             android:textColor="@color/white"
             android:backgroundTint="@color/hat_blue"
-            />
+            />-->
         <TextView
             android:id="@+id/titleHT"
             android:layout_width="wrap_content"

@@ -21,10 +21,9 @@ public class ConnectThread extends Thread {
         BluetoothSocket tmp = null;
         this.handler=handler;
         try {
-
             tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
         } catch (IOException e) {
-            Log.e("Connect", "Socket's create() method failed", e);
+            Log.e("Connect", "El metodo create() fallo", e);
         }
         mmSocket = tmp;
     }
@@ -47,9 +46,8 @@ public class ConnectThread extends Thread {
                 handler.sendMessage(readFailMsg);
             }
             sendToast("Error al conectar con el dispositivo Bluetooth");
-            return;
-        }
 
+        }
 
     }
     public BluetoothSocket getMmSocket(){
@@ -61,7 +59,7 @@ public class ConnectThread extends Thread {
         try {
             mmSocket.close();
         } catch (IOException e) {
-            Log.e("Connect", "Could not close the client socket", e);
+            Log.e("Connect", "No se pudo cerrar el socket", e);
         }
     }
 

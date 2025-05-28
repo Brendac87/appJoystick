@@ -5,4 +5,6 @@ public interface MessageConstants {
         int MESSAGE_WRITE = 1;
         int MESSAGE_TOAST = 2;
 
+        int MESSAGE_DISCONNECTED = 3;
+
 }

@@ -51,24 +51,71 @@
             android:orientation="vertical"
             tools:ignore="NestedWeights">
 
+            <TextView
+                android:id="@+id/titleDevicesText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bluetooth Device:"
+                android:gravity="center"
+                android:textColor="@color/black"
+                />
+            <TextView
+                android:id="@+id/deviceText"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:text=""
+                android:textColor="@color/black"
+
+                />
             <Button
-                android:id="@+id/connect_button"
-                android:layout_width="160dp"
-                android:layout_height="70dp"
-                android:text="Connect"
+                android:id="@+id/searchButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="0dp"
+                android:layout_marginTop="0dp"
+                android:text="Search"
                 android:textColor="@color/white"
-                android:backgroundTint="@color/hat_blue"/>
+                android:backgroundTint="@color/hat_blue"
+                />
+
+            <TextView
+                android:id="@+id/titleHT"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sensor Reading:"
+                android:textColor="@color/black"
+
+                />
+
+            <TextView
+                android:id="@+id/deviceReading"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:text=""
+
+                android:textColor="@color/black"
+                android:textSize="15sp" />
+
+
+            <Button
+                android:id="@+id/connectButton"
+                android:layout_width="110dp"
+                android:layout_height="50dp"
+
+                android:backgroundTint="@color/hat_blue"
+                android:text="Connect"
+                android:textColor="@color/white" />
 
             <TextView
                 android:id="@+id/status"
-                android:layout_width="wrap_content"
+                android:layout_width="297dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:fontFamily="sans-serif-light"
+                android:layout_marginEnd="0dp"
+
                 android:gravity="center"
                 android:text="Status: Disconnected"
                 android:textColor="@color/black"
-                android:textSize="18sp" />
+                />
         </LinearLayout>
 
         <!-- Sección Joystick -->

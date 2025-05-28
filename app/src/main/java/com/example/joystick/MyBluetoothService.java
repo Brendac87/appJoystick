@@ -58,7 +58,7 @@ public class MyBluetoothService {
                 try {
                     //Lectura
                     int data = mmInStream.read(); //lee un byte a la vez
-                    if (data == -1) break; //fin de stream
+                    if (data == -1) throw new IOException("Stream cerrado"); //fin de stream
 
                     mmBuffer[numBytes++] = (byte) data;
 
@@ -76,7 +76,8 @@ public class MyBluetoothService {
                         numBytes = 0; //reiniciar buffer
                     }
                 } catch (IOException e) {
-                    Log.d("Connected", "Input stream was disconnected", e);
+                    Log.d("Connected", "Input stream desconectado", e);
+                    handler.obtainMessage(MessageConstants.MESSAGE_DISCONNECTED).sendToTarget();
                     break;
                 }
             }
