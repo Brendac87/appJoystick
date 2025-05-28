@@ -17,8 +17,9 @@
         android:layout_marginEnd="0dp"
         android:layout_marginStart="0dp"
         android:orientation="horizontal">
+
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@color/violet_blue"
             android:text="Joystick Robot"
@@ -30,39 +31,92 @@
             android:letterSpacing="0.05"
             android:padding="12dp"/>
 
-
-
     </LinearLayout>
 
     <LinearLayout
 
         android:layout_width="match_parent"
-        android:layout_height="90dp"
+
+        android:layout_height="310dp"
         android:layout_marginStart="0dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="0dp"
         android:gravity="center"
         android:orientation="vertical">
+        <!--android:layout_height="250dp"-->
+        <TextView
+            android:id="@+id/titleDevicesText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bluetooth Device:"
+            android:gravity="center"
+            android:textColor="@color/black"
+            />
+        <TextView
+            android:id="@+id/deviceText"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text=""
+            android:textColor="@color/black"
+
+            />
+        <Button
+            android:id="@+id/searchButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="0dp"
+            android:text="Search"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/hat_blue"
+            />
+        <Button
+            android:id="@+id/sendButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="0dp"
+            android:text="Send"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/hat_blue"
+            />
+        <TextView
+            android:id="@+id/titleHT"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sensor Reading:"
+            android:textColor="@color/black"
+
+            />
+
+        <TextView
+            android:id="@+id/deviceReading"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text=""
+
+            android:textColor="@color/black"
+            android:textSize="15sp" />
 
 
         <Button
-            android:id="@+id/connect_button"
-            android:layout_width="160dp"
-            android:layout_height="70dp"
-            android:layout_weight="1"
+            android:id="@+id/connectButton"
+            android:layout_width="110dp"
+            android:layout_height="50dp"
+
+            android:backgroundTint="@color/hat_blue"
             android:text="Connect"
-            android:textColor="@color/white"
-            android:backgroundTint="@color/hat_blue"/>
+            android:textColor="@color/white" />
 
         <TextView
             android:id="@+id/status"
             android:layout_width="297dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="0dp"
-            android:fontFamily="sans-serif-light"
+
             android:gravity="center"
             android:text="Status: Disconnected"
             android:textColor="@color/black"
-            android:textSize="18sp" />
+            />
 
     </LinearLayout>
 
@@ -80,7 +134,7 @@
 
 
         <com.example.joystick.JoystickView
-            android:id="@+id/joystickview"
+            android:id="@+id/joystickView"
             android:layout_width="300dp"
             android:layout_height="300dp"
             android:layout_gravity="center"
@@ -107,7 +161,7 @@
                 android:textSize="20sp" />
 
             <TextView
-                android:id="@+id/coordinate_text"
+                android:id="@+id/coordinateText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-light"
