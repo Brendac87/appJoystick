@@ -3,6 +3,7 @@ package com.example.joystick;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -49,12 +50,16 @@ public class MainActivity extends AppCompatActivity {
     private TextView deviceText;
     private TextView deviceReading;
     private Handler uiHandler;
+    private Handler connectionHandler;
     private ConnectThread currentConnectThread;
     private MyBluetoothService.ConnectedThread readWriteThread;
 
     private static final String TAG = "MainActivity";
-    private static final int PERMISSION_REQUEST_CODE = 1001;
+    private static final int PERMISSION_REQUEST_CODE = 100;
     private static final int REQUEST_ENABLE_BT = 1;
+    private boolean isConnected;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +106,21 @@ public class MainActivity extends AppCompatActivity {
 
                         case MessageConstants.MESSAGE_DISCONNECTED:
                             cleanSession();
+                            statusText.setText("Status: USO EL HANDLER DISCONNECTED");
+                            isConnected = false;
+                            break;
+                        case MessageConstants.MESSAGE_CONNECTION_SUCCESS:
+                            handleConnectionSuccess((BluetoothSocket) msg.obj);
+                            break;
+
+                        case MessageConstants.MESSAGE_CONNECTION_FAILED:
+                            handleConnectionFailure();
+                            isConnected = false;
+                            break;
+
+                        case MessageConstants.MESSAGE_CONNECTION_IN_PROGRESS:
+                            statusText.setText("Status: Connecting...");
+                            connectButton.setEnabled(false);
                             break;
                     }
                 }
@@ -181,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
                                 standardUUID = device.getUuids()[0].getUuid();
                                 robotBluetoothDevice = device;
                                 //conectar al dispositivo
-                                connectButton.setEnabled(true);
+                                //connectButton.setEnabled(true);
                                 //statusText.setText("Status: Connected");
                             }
                             deviceText.setText(deviceFound);
@@ -206,16 +226,17 @@ public class MainActivity extends AppCompatActivity {
                     //si no hay dispositivo
                     if (robotBluetoothDevice == null) {
                         Toast.makeText(v.getContext(),
-                                "El Bluetooth no detecto el dispositivo",
+                                "No se detecto el dispositivo",
                                 Toast.LENGTH_SHORT).show();
                     } else {
                         //cierra hilo de lectura/escritura anterior si existe
-                        if (readWriteThread != null) {
-                            readWriteThread.cancel();
-                            readWriteThread = null;
-                        }  // Libera la referencia
-                        //flujo de conexion
-                        bluetoothConnectionStream();
+                        Toast.makeText(v.getContext(),
+                                "ENTRANDO B/ON, PERMISON/ON Y DEVICE ON",
+                                Toast.LENGTH_SHORT).show();
+                        if (!isConnected) {
+
+                            bluetoothConnectionStream();
+                        }
 
                     }
                 }
@@ -226,12 +247,15 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("MissingPermission")
     private void bluetoothConnectionStream() {
         //lanza en un hilo de fondo la conexión
+
+
         new Thread(() -> {
             bluetoothAdapter.cancelDiscovery();//Cancelar discovery para no ralentizar la conexión
+
             ConnectThread ct = new ConnectThread( //intentar conectar el socket
                     robotBluetoothDevice,
                     standardUUID,
-                    uiHandler        //Handler que actualiza deviceReading
+                    uiHandler     //Handler que actualiza deviceReading
             );
             currentConnectThread = ct;
             ct.start();
@@ -241,20 +265,47 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, "Interrumpido esperando ConnectThread", e);
                 Thread.currentThread().interrupt();
             }
-
+/*
             if (ct.getMmSocket() != null && ct.getMmSocket().isConnected()) {
-                runOnUiThread(() -> statusText.setText("Status: Connected"));/***********/
+                runOnUiThread(() -> statusText.setText("Status: Connected"));
                 //conecto, entonces arranca el hilo de lectura
                 MyBluetoothService btService = new MyBluetoothService(uiHandler);
                 readWriteThread = btService.new ConnectedThread(ct.getMmSocket());
                 readWriteThread.start();
             } else {
                 //si falla actualiza la ui
-                runOnUiThread(() -> statusText.setText("Status: Disconnected"));
-            }
+                runOnUiThread(() -> statusText.setText("Status: Disconnected1"));
+                connectionHandler.sendEmptyMessage(MessageConstants.MESSAGE_CONNECTION_FAILED);
+            }*/
         }, "BT-Connect-Thread").start();
 
     }
+
+
+    private void handleConnectionSuccess(BluetoothSocket socket) {
+        runOnUiThread(() -> statusText.setText("Status: Connected"));
+
+        // Iniciar hilo de lectura/escritura
+        MyBluetoothService btService = new MyBluetoothService(uiHandler);
+        readWriteThread = btService.new ConnectedThread(socket);
+        readWriteThread.start();
+
+        connectButton.setEnabled(true);
+        isConnected = true;
+    }
+
+    private void handleConnectionFailure() {
+        runOnUiThread(() -> {
+            statusText.setText("Status: Connection Failed");
+            connectButton.setEnabled(true);
+        });
+        cleanSession();
+    }
+
+
+
+
+
     private void cleanSession(){
         deviceText.setText("");
         deviceReading.setText("");
@@ -298,22 +349,34 @@ public class MainActivity extends AppCompatActivity {
     public boolean bluetoothPermissionGranted(Context context) //chequea si el dispositivo tiene los permisos
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            //android 12+: este sí es un permiso “dangerous”
-            return ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT
-            ) == PackageManager.PERMISSION_GRANTED;
-
+            // Android 12+ (API 31+)
+            return ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED;
+        } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R || Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+            // Android 10 y 11
+            return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
         } else {
-            //<=android 10: BLUETOOTH es normal y ya está concedido
+            // Android 9 o menor: permisos normales, ya están concedidos
             return true;
         }
     }
 
     public void requestBluetoothPermission() { //request de los permisos
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            //Android 12+
+            // Android 12+
             ActivityCompat.requestPermissions(
                     this,
-                    new String[]{Manifest.permission.BLUETOOTH_CONNECT},
+                    new String[]{
+                            Manifest.permission.BLUETOOTH_CONNECT,
+                            Manifest.permission.BLUETOOTH_SCAN
+                    },
+                    PERMISSION_REQUEST_CODE
+            );
+        } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R || Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+            // Android 10 y 11
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSION_REQUEST_CODE
             );
         }
@@ -326,13 +389,19 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permiso concedido
-                Toast.makeText(this, "Permiso de Bluetooth concedido", Toast.LENGTH_SHORT).show();
+            boolean granted = true;
 
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    granted = false;
+                    break;
+                }
+            }
+
+            if (granted) {
+                Toast.makeText(this, "Permisos de Bluetooth concedidos", Toast.LENGTH_SHORT).show();
             } else {
-                // Permiso denegado
-                Toast.makeText(this, "Permiso de Bluetooth no habilitado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Permisos de Bluetooth denegados", Toast.LENGTH_SHORT).show();
             }
         }
 

@@ -7,4 +7,8 @@ public interface MessageConstants {
 
         int MESSAGE_DISCONNECTED = 3;
 
+        int MESSAGE_CONNECTION_SUCCESS = 4;
+        int MESSAGE_CONNECTION_FAILED = 5;
+        int MESSAGE_CONNECTION_IN_PROGRESS = 6;
+
 }

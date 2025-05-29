@@ -15,11 +15,12 @@ public class ConnectThread extends Thread {
     private final BluetoothSocket mmSocket;
     private Handler handler;
 
+
     @SuppressLint("MissingPermission")
     public ConnectThread(BluetoothDevice device, UUID MY_UUID, Handler handler) {
         //Usa un objeto temporal para luego asignarlo a mmSocket porque es final
         BluetoothSocket tmp = null;
-        this.handler=handler;
+        this.handler = handler;
         try {
             tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
         } catch (IOException e) {
@@ -31,21 +32,28 @@ public class ConnectThread extends Thread {
     @SuppressLint("MissingPermission")
     public void run() {
         //bluetoothAdapter.cancelDiscovery(); //Detiene cualquier escaneo
+        sendToast("a punto de conectar");
+        handler.sendEmptyMessage(MessageConstants.MESSAGE_CONNECTION_IN_PROGRESS);
+        sendToast("a punto de conectar2");
         try {
             //Conecta con el disposito a traves del socket
             mmSocket.connect();
             sendToast("Conexión establecida con éxito");
+            // Notificar éxito con el socket
+            Message successMsg = handler.obtainMessage(
+                    MessageConstants.MESSAGE_CONNECTION_SUCCESS,
+                    mmSocket
+            );
+            handler.sendMessage(successMsg);
         } catch (IOException connectException) {
             //No se pudo conectar cierra el socket y regresa
+            sendToast("Error CONEXION ON CONNECT THREAD");
 
             Log.e("Connect", "connectException: " + connectException);
+            handler.sendEmptyMessage(MessageConstants.MESSAGE_CONNECTION_FAILED);
             cancel();
-            if (handler != null) {
-                Message readFailMsg = handler.obtainMessage(MessageConstants.MESSAGE_READ);
-                readFailMsg.obj = "--";
-                handler.sendMessage(readFailMsg);
-            }
-            sendToast("Error al conectar con el dispositivo Bluetooth");
+
+
 
         }
 

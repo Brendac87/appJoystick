@@ -101,7 +101,6 @@
                 android:id="@+id/connectButton"
                 android:layout_width="110dp"
                 android:layout_height="50dp"
-
                 android:backgroundTint="@color/hat_blue"
                 android:text="Connect"
                 android:textColor="@color/white" />
