@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 import android.os.Handler;
 
@@ -38,12 +37,12 @@ public class MyBluetoothService {
             try {
                 tmpIn = socket.getInputStream();
             } catch (IOException e) {
-                Log.e("Connected", "Error occurred when creating input stream", e);
+                Log.e("Connected", "Error creando el input stream", e);
             }
             try {
                 tmpOut = socket.getOutputStream();
             } catch (IOException e) {
-                Log.e("Connected", "Error occurred when creating output stream", e);
+                Log.e("Connected", "Error creando el output stream", e);
             }
 
             mmInStream = tmpIn;
@@ -69,7 +68,6 @@ public class MyBluetoothService {
                         String readMessage = new String(mmBuffer, 0, numBytes, StandardCharsets.UTF_8).trim();
 
                         //enviar msj al handler
-
                         Message readMsg = handler.obtainMessage(
                                 com.example.joystick.MessageConstants.MESSAGE_READ, readMessage);
                         readMsg.sendToTarget();

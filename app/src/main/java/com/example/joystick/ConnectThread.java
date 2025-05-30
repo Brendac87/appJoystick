@@ -32,9 +32,9 @@ public class ConnectThread extends Thread {
     @SuppressLint("MissingPermission")
     public void run() {
         //bluetoothAdapter.cancelDiscovery(); //Detiene cualquier escaneo
-        sendToast("a punto de conectar");
+
         handler.sendEmptyMessage(MessageConstants.MESSAGE_CONNECTION_IN_PROGRESS);
-        sendToast("a punto de conectar2");
+
         try {
             //Conecta con el disposito a traves del socket
             mmSocket.connect();
@@ -47,14 +47,11 @@ public class ConnectThread extends Thread {
             handler.sendMessage(successMsg);
         } catch (IOException connectException) {
             //No se pudo conectar cierra el socket y regresa
-            sendToast("Error CONEXION ON CONNECT THREAD");
+            sendToast("Error de conexion con el dispositivo");
 
             Log.e("Connect", "connectException: " + connectException);
             handler.sendEmptyMessage(MessageConstants.MESSAGE_CONNECTION_FAILED);
             cancel();
-
-
-
         }
 
     }

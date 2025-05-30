@@ -62,7 +62,7 @@
             <TextView
                 android:id="@+id/deviceText"
                 android:layout_width="wrap_content"
-                android:layout_height="30dp"
+                android:layout_height="40dp"
                 android:text=""
                 android:textColor="@color/black"
 
@@ -127,7 +127,7 @@
             >
 
             <com.example.joystick.JoystickView
-                android:id="@+id/joystickview"
+                android:id="@+id/joystickView"
                 android:layout_width="250dp"
                 android:layout_height="250dp"
                 android:layout_marginTop="0dp"
@@ -151,7 +151,7 @@
                     android:textSize="20sp" />
 
                 <TextView
-                    android:id="@+id/coordinate_text"
+                    android:id="@+id/coordinateText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-light"

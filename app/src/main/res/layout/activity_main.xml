@@ -35,9 +35,10 @@
 
     <LinearLayout
 
-        android:layout_width="match_parent"
 
-        android:layout_height="250dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:layout_marginStart="0dp"
         android:layout_marginTop="0dp"
         android:gravity="center"
@@ -54,7 +55,7 @@
         <TextView
             android:id="@+id/deviceText"
             android:layout_width="wrap_content"
-            android:layout_height="30dp"
+            android:layout_height="40dp"
             android:text=""
             android:textColor="@color/black"
 
@@ -69,17 +70,7 @@
             android:textColor="@color/white"
             android:backgroundTint="@color/hat_blue"
             />
-        <!-- prueba de boton de envio
-        <Button
-            android:id="@+id/sendButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="0dp"
-            android:layout_marginTop="0dp"
-            android:text="Send"
-            android:textColor="@color/white"
-            android:backgroundTint="@color/hat_blue"
-            />-->
+
         <TextView
             android:id="@+id/titleHT"
             android:layout_width="wrap_content"
@@ -127,8 +118,9 @@
 
         android:id="@+id/joystick_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
         android:orientation="vertical"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:gravity="center">
         <!--Joystick-->
 
@@ -145,6 +137,7 @@
             android:layout_width="230dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="0dp"
+            android:layout_marginBottom="10dp"
             android:gravity="center"
             android:orientation="horizontal">
 

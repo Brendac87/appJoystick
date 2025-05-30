@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.graphics.Color;
@@ -49,8 +50,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView statusText;
     private TextView deviceText;
     private TextView deviceReading;
+    private TextView coordinateText; // Declarada aquí
+    private TextView directionText;  // Declarada aquí
+    private JoystickView joystickView; // Declarada aquí
     private Handler uiHandler;
-    private Handler connectionHandler;
     private ConnectThread currentConnectThread;
     private MyBluetoothService.ConnectedThread readWriteThread;
 
@@ -68,10 +71,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
+
+
+
         //Joystick, coordenadas y direcciones
-        JoystickView joystickView = findViewById(R.id.joystickView);
-        TextView coordinateText = findViewById(R.id.coordinateText);
-        TextView directionText = findViewById(R.id.directionText);
+        joystickView = findViewById(R.id.joystickView);
+        coordinateText = findViewById(R.id.coordinateText);
+        directionText = findViewById(R.id.directionText);
 
 
         //Connexion Bluetooth, busqueda device, estado
@@ -83,7 +89,8 @@ public class MainActivity extends AppCompatActivity {
         deviceText = findViewById(R.id.deviceText);
         deviceReading = findViewById(R.id.deviceReading);
 
-        //Button sendButton = findViewById(R.id.sendButton);
+
+
 
         //definición del Handler
             uiHandler = new Handler(Looper.getMainLooper()) {
@@ -106,7 +113,6 @@ public class MainActivity extends AppCompatActivity {
 
                         case MessageConstants.MESSAGE_DISCONNECTED:
                             cleanSession();
-                            statusText.setText("Status: USO EL HANDLER DISCONNECTED");
                             isConnected = false;
                             break;
                         case MessageConstants.MESSAGE_CONNECTION_SUCCESS:
@@ -120,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
 
                         case MessageConstants.MESSAGE_CONNECTION_IN_PROGRESS:
                             statusText.setText("Status: Connecting...");
-                            connectButton.setEnabled(false);
+                            //connectButton.setEnabled(false);
                             break;
                     }
                 }
@@ -141,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else{
                     //enviar al Arduino
-                    if (readWriteThread != null) {
+                    if (readWriteThread != null && isConnected) {
                         String message = String.format("X%.2fY%.2f\n", xPercent, yPercent); //ejemplo: X0.75Y-0.42
                         readWriteThread.write(message.getBytes(StandardCharsets.UTF_8));
                     }
@@ -150,14 +156,8 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        /* //prueba para un led
-        sendButton.setOnClickListener(v -> {
-            String command = "on"; // o "off"
 
-            if (readWriteThread != null) {
-                readWriteThread.write(command.getBytes());
-            }
-        });*/
+
 
 
         //barra de estado
@@ -222,66 +222,45 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (!bluetoothAdapter.isEnabled() || !permissionBluetooth()) { //bluetooth está apagado o faltan permisos
                     cleanSession();
-                } else {
-                    //si no hay dispositivo
-                    if (robotBluetoothDevice == null) {
-                        Toast.makeText(v.getContext(),
-                                "No se detecto el dispositivo",
-                                Toast.LENGTH_SHORT).show();
-                    } else {
-                        //cierra hilo de lectura/escritura anterior si existe
-                        Toast.makeText(v.getContext(),
-                                "ENTRANDO B/ON, PERMISON/ON Y DEVICE ON",
-                                Toast.LENGTH_SHORT).show();
-                        if (!isConnected) {
-
-                            bluetoothConnectionStream();
-                        }
-
-                    }
+                } else if (robotBluetoothDevice == null) {
+                    Toast.makeText(v.getContext(),
+                            "No se detecto el dispositivo", //si no hay dispositivo
+                            Toast.LENGTH_SHORT).show();
+                } else if (!isConnected) {
+                    terminateBluetoothSession();
+                    bluetoothConnectionStream();
                 }
             }
         });
+
+
     }
 
     @SuppressLint("MissingPermission")
     private void bluetoothConnectionStream() {
         //lanza en un hilo de fondo la conexión
 
-
         new Thread(() -> {
             bluetoothAdapter.cancelDiscovery();//Cancelar discovery para no ralentizar la conexión
 
-            ConnectThread ct = new ConnectThread( //intentar conectar el socket
+            currentConnectThread = new ConnectThread( //intentar conectar el socket
                     robotBluetoothDevice,
                     standardUUID,
-                    uiHandler     //Handler que actualiza deviceReading
+                    uiHandler     //Handler que actualiza deviceReading o el estado de la conexion
             );
-            currentConnectThread = ct;
-            ct.start();
+
+            currentConnectThread.start();
             try {
-                ct.join();  //bloquea este hilo de fondo hasta que ct.run() termine
+                currentConnectThread.join();  //espera este hilo de fondo hasta que ct.run() termine
             } catch (InterruptedException e) {
                 Log.e(TAG, "Interrumpido esperando ConnectThread", e);
                 Thread.currentThread().interrupt();
             }
-/*
-            if (ct.getMmSocket() != null && ct.getMmSocket().isConnected()) {
-                runOnUiThread(() -> statusText.setText("Status: Connected"));
-                //conecto, entonces arranca el hilo de lectura
-                MyBluetoothService btService = new MyBluetoothService(uiHandler);
-                readWriteThread = btService.new ConnectedThread(ct.getMmSocket());
-                readWriteThread.start();
-            } else {
-                //si falla actualiza la ui
-                runOnUiThread(() -> statusText.setText("Status: Disconnected1"));
-                connectionHandler.sendEmptyMessage(MessageConstants.MESSAGE_CONNECTION_FAILED);
-            }*/
         }, "BT-Connect-Thread").start();
 
     }
 
-
+    //Funciones de manejo en caso de Conexion exitosa o fallida
     private void handleConnectionSuccess(BluetoothSocket socket) {
         runOnUiThread(() -> statusText.setText("Status: Connected"));
 
@@ -299,18 +278,19 @@ public class MainActivity extends AppCompatActivity {
             statusText.setText("Status: Connection Failed");
             connectButton.setEnabled(true);
         });
-        cleanSession();
+        terminateBluetoothSession();
     }
 
 
-
-
+    //Funciones de limpieza de sesion, termina los hilos
 
     private void cleanSession(){
         deviceText.setText("");
         deviceReading.setText("");
         statusText.setText("Status: Disconnected");
         terminateBluetoothSession();
+        //no hay un dispositivo seleccionado
+        robotBluetoothDevice = null;
     }
 
     private void terminateBluetoothSession() {
@@ -323,11 +303,9 @@ public class MainActivity extends AppCompatActivity {
             currentConnectThread.cancel();
             currentConnectThread = null;   // Libera la referencia
         }
-        //no hay un dispositivo seleccionado
-        robotBluetoothDevice = null;
     }
 
-    //Verifica si hay bluetooth y si tiene los permisos, sino hace el request
+    //Funciones de Bluetooth, Verifica si hay bluetooth, los permisos, el request y el resultado
     private boolean permissionBluetooth() {
         if (!isBluetoothAvailable()) {
             Toast.makeText(this, "Bluetooth no disponible en este dispositivo", Toast.LENGTH_SHORT).show();
@@ -398,13 +376,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            if (granted) {
-                Toast.makeText(this, "Permisos de Bluetooth concedidos", Toast.LENGTH_SHORT).show();
-            } else {
+            if (!granted) {
                 Toast.makeText(this, "Permisos de Bluetooth denegados", Toast.LENGTH_SHORT).show();
-            }
+            } 
         }
 
     }
+
+
+
+
+
 
 }
