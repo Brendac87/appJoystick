@@ -7,7 +7,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
+
 import android.os.Build;
 import android.os.Bundle;
 import android.graphics.Color;
@@ -50,9 +50,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView statusText;
     private TextView deviceText;
     private TextView deviceReading;
-    private TextView coordinateText; // Declarada aquí
-    private TextView directionText;  // Declarada aquí
-    private JoystickView joystickView; // Declarada aquí
+    private TextView coordinateText;
+    private TextView directionText;
+    private JoystickView joystickView;
     private Handler uiHandler;
     private ConnectThread currentConnectThread;
     private MyBluetoothService.ConnectedThread readWriteThread;
@@ -69,8 +69,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-
-
 
 
 
@@ -147,8 +145,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else{
                     //enviar al Arduino
-                    if (readWriteThread != null && isConnected) {
-                        String message = String.format("X%.2fY%.2f\n", xPercent, yPercent); //ejemplo: X0.75Y-0.42
+                    if (readWriteThread != null && isConnected && !direction.equals("Idle")) {
+                        String message = String.format("X%.2fY%.2f\n", xPercent, yPercent); //ejemplo: X0.75Y0.42
                         readWriteThread.write(message.getBytes(StandardCharsets.UTF_8));
                     }
 
@@ -158,8 +156,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
-
         //barra de estado
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
@@ -167,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //margenes
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -196,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
                             String deviceHardwareAddress = device.getAddress(); //MAC address
                             deviceFound= deviceFound + deviceName + " / "+deviceHardwareAddress+"\n";
                             //deviceFound= deviceFound +deviceHardwareAddress+"\n";
-                            if (deviceName.equals("DESKTOP-2S48VJB")) {
+                            if (deviceName.equals("HC-05")) { //esta el nombre del bluetooth por defecto del HC5
                                 Log.d(TAG, "HC-05 bluetooth encontrado");
                                 standardUUID = device.getUuids()[0].getUuid();
                                 robotBluetoothDevice = device;
