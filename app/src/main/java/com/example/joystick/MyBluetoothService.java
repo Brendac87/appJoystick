@@ -100,6 +100,7 @@ public class MyBluetoothService {
                         "No se pudo enviar los datos al otro dispositivo");
                 writeErrorMsg.setData(bundle);
                 handler.sendMessage(writeErrorMsg);
+                handler.obtainMessage(MessageConstants.MESSAGE_DISCONNECTED).sendToTarget();
             }
         }
 

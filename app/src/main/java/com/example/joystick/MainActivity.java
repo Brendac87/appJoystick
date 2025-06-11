@@ -49,9 +49,13 @@ public class MainActivity extends AppCompatActivity {
     private Button searchButton;
     private TextView statusText;
     private TextView deviceText;
-    private TextView deviceReading;
     private TextView coordinateText;
     private TextView directionText;
+
+    private Button button1;
+    private Button button2;
+    private Button button3;
+    private Button button4;
     private JoystickView joystickView;
     private Handler uiHandler;
     private ConnectThread currentConnectThread;
@@ -85,7 +89,13 @@ public class MainActivity extends AppCompatActivity {
         connectButton = findViewById(R.id.connectButton);
         statusText = findViewById(R.id.status);
         deviceText = findViewById(R.id.deviceText);
-        deviceReading = findViewById(R.id.deviceReading);
+
+
+        //referencias a los botones
+        button1 = findViewById(R.id.button1);
+        button2 = findViewById(R.id.button2);
+        button3 = findViewById(R.id.button3);
+        button4 = findViewById(R.id.button4);
 
 
 
@@ -100,8 +110,8 @@ public class MainActivity extends AppCompatActivity {
                             break;
 
                         case MessageConstants.MESSAGE_READ:
-                            String value = (String) msg.obj;
-                            deviceReading.setText(value);
+                            //String value = (String) msg.obj;
+
                             break;
 
                         case MessageConstants.MESSAGE_WRITE:
@@ -110,21 +120,22 @@ public class MainActivity extends AppCompatActivity {
                             break;
 
                         case MessageConstants.MESSAGE_DISCONNECTED:
-                            cleanSession();
                             isConnected = false;
+                            cleanSession();
+
                             break;
                         case MessageConstants.MESSAGE_CONNECTION_SUCCESS:
                             handleConnectionSuccess((BluetoothSocket) msg.obj);
                             break;
 
                         case MessageConstants.MESSAGE_CONNECTION_FAILED:
-                            handleConnectionFailure();
                             isConnected = false;
+                            handleConnectionFailure();
+
                             break;
 
                         case MessageConstants.MESSAGE_CONNECTION_IN_PROGRESS:
                             statusText.setText("Status: Connecting...");
-                            //connectButton.setEnabled(false);
                             break;
                     }
                 }
@@ -133,11 +144,13 @@ public class MainActivity extends AppCompatActivity {
 
         setupSearchButton();
         setupConnectButton();
+        setupOptionButton();
 
         joystickView.setOnJoystickMoveListener(new OnJoystickMoveListener() {
             @Override
             public void onMove(float xPercent, float yPercent, String direction) {
-                coordinateText.setText(String.format("X: %.2f, Y: %.2f", xPercent, yPercent));
+                float invertedY=-yPercent;
+                coordinateText.setText(String.format("X: %.2f, Y: %.2f", xPercent, invertedY));
                 directionText.setText(direction);
 
                 if (!bluetoothAdapter.isEnabled() || !permissionBluetooth()) { //bluetooth está apagado o faltan permisos
@@ -145,8 +158,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else{
                     //enviar al Arduino
-                    if (readWriteThread != null && isConnected && !direction.equals("Idle")) {
-                        String message = String.format("X%.2fY%.2f\n", xPercent, yPercent); //ejemplo: X0.75Y0.42
+                    if (readWriteThread != null && isConnected && !direction.equals("Idle")) { //se agrega el ; y el eje y invertido
+                        String message = String.format("X%.2fY%.2f;\n", xPercent, invertedY); //ejemplo: X0.75Y0.42
                         readWriteThread.write(message.getBytes(StandardCharsets.UTF_8));
                     }
 
@@ -163,7 +176,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //margenes
-
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -191,7 +203,8 @@ public class MainActivity extends AppCompatActivity {
                         for (BluetoothDevice device : pairedDevices) {
                             String deviceName = device.getName();
                             String deviceHardwareAddress = device.getAddress(); //MAC address
-                            deviceFound= deviceFound + deviceName + " / "+deviceHardwareAddress+"\n";
+                            //deviceFound= deviceFound + deviceName + "\n";
+                            deviceFound= deviceFound + deviceName + " | "+deviceHardwareAddress+"\n";
                             //deviceFound= deviceFound +deviceHardwareAddress+"\n";
                             if (deviceName.equals("HC-05")) { //esta el nombre del bluetooth por defecto del HC5
                                 Log.d(TAG, "HC-05 bluetooth encontrado");
@@ -223,6 +236,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(v.getContext(),
                             "No se detecto el dispositivo", //si no hay dispositivo
                             Toast.LENGTH_SHORT).show();
+
                 } else if (!isConnected) {
                     terminateBluetoothSession();
                     bluetoothConnectionStream();
@@ -230,6 +244,27 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+    }
+    private void setupOptionButton() {
+        setupCommandButton(button1, "1"); //opciones de los botones
+        setupCommandButton(button2, "2");
+        setupCommandButton(button3, "3");
+        setupCommandButton(button4, "4");
+    }
+
+    private void setupCommandButton(Button button, String command){
+        if (button != null) {
+            button.setOnClickListener(v -> {
+                if (readWriteThread != null && isConnected) {
+                    readWriteThread.write((command + ";").getBytes(StandardCharsets.UTF_8)); //se envia la opcion + ; | ejemplo: 2; 4; | se puede agregar salto de linea dependiendo de la conf del arduino
+                    uiHandler.obtainMessage(MessageConstants.MESSAGE_TOAST, "Enviado: " + command).sendToTarget();
+
+                } else {
+                    uiHandler.obtainMessage(MessageConstants.MESSAGE_TOAST, "Sin conexión con el dispositivo").sendToTarget();
+                }
+            });
+        }
 
     }
 
@@ -265,29 +300,38 @@ public class MainActivity extends AppCompatActivity {
         MyBluetoothService btService = new MyBluetoothService(uiHandler);
         readWriteThread = btService.new ConnectedThread(socket);
         readWriteThread.start();
-
-        connectButton.setEnabled(true);
         isConnected = true;
+        updateButtonEnabledState();
+
     }
 
     private void handleConnectionFailure() {
         runOnUiThread(() -> {
             statusText.setText("Status: Connection Failed");
-            connectButton.setEnabled(true);
+
         });
         terminateBluetoothSession();
+        updateButtonEnabledState();
+    }
+
+    private void updateButtonEnabledState()
+    {
+        boolean enabled = isConnected;
+        button1.setEnabled(enabled);
+        button2.setEnabled(enabled);
+        button3.setEnabled(enabled);
+        button4.setEnabled(enabled);
     }
 
 
     //Funciones de limpieza de sesion, termina los hilos
-
     private void cleanSession(){
         deviceText.setText("");
-        deviceReading.setText("");
         statusText.setText("Status: Disconnected");
         terminateBluetoothSession();
         //no hay un dispositivo seleccionado
         robotBluetoothDevice = null;
+        updateButtonEnabledState();
     }
 
     private void terminateBluetoothSession() {

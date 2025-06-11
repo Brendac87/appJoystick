@@ -13,9 +13,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
-        android:layout_marginEnd="0dp"
-        android:layout_marginStart="0dp"
         android:orientation="horizontal">
 
         <TextView
@@ -30,101 +27,148 @@
             android:layout_weight="1"
             android:letterSpacing="0.05"
             android:padding="12dp"/>
-
     </LinearLayout>
 
     <LinearLayout
-
-
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="0dp"
+        android:layout_height="wrap_content"
         android:gravity="center"
-        android:orientation="vertical">
-        <!--android:layout_height="250dp"-->
+        android:orientation="vertical"
+        android:layout_margin="15dp">
+
         <TextView
             android:id="@+id/titleDevicesText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Bluetooth Device:"
             android:gravity="center"
-            android:textColor="@color/black"
-            />
+            android:textColor="@color/black"/>
+
         <TextView
             android:id="@+id/deviceText"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:text=""
-            android:textColor="@color/black"
+            android:textColor="@color/black"/>
 
-            />
         <Button
             android:id="@+id/searchButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="0dp"
-            android:layout_marginTop="0dp"
             android:text="Search"
-            android:textColor="@color/white"
-            android:backgroundTint="@color/hat_blue"
-            />
-
-        <TextView
-            android:id="@+id/titleHT"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Sensor Reading:"
-            android:textColor="@color/black"
-
-            />
-
-        <TextView
-            android:id="@+id/deviceReading"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:text=""
-
-            android:textColor="@color/black"
-            android:textSize="15sp" />
-
-
-        <Button
-            android:id="@+id/connectButton"
-            android:layout_width="110dp"
-            android:layout_height="50dp"
-
-            android:backgroundTint="@color/hat_blue"
-            android:text="Connect"
-            android:textColor="@color/white" />
+            app:backgroundTint="@color/hat_blue"
+            app:strokeWidth="2dp"
+            app:strokeColor="@color/violet_blue"
+            android:textColor="@color/white"/>
 
         <TextView
             android:id="@+id/status"
             android:layout_width="297dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="0dp"
-
             android:gravity="center"
             android:text="Status: Disconnected"
-            android:textColor="@color/black"
-            />
+            android:textColor="@color/black"/>
+
+        <Button
+            android:id="@+id/connectButton"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:backgroundTint="@color/hat_blue"
+            android:text="Connect"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/hat_blue"
+            app:strokeWidth="2dp"
+            app:strokeColor="@color/violet_blue"/>
+
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/options_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_marginTop="1dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp">
 
+        <TextView
+            android:id="@+id/options"
+            android:layout_width="297dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Options:"
+            android:textColor="@color/black"/>
+
+        <LinearLayout
+            android:id="@+id/button_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/button1"
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="1"
+                android:layout_margin="10dp"
+                app:backgroundTint="@color/hat_blue"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/violet_blue"
+                android:textColor="@color/white"
+                android:enabled="false"/>
+
+            <Button
+                android:id="@+id/button2"
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="2"
+                android:layout_margin="10dp"
+                app:backgroundTint="@color/hat_blue"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/violet_blue"
+                android:textColor="@color/white"
+                android:enabled="false"/>
+
+            <Button
+                android:id="@+id/button3"
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="3"
+                android:layout_margin="10dp"
+                app:backgroundTint="@color/hat_blue"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/violet_blue"
+                android:textColor="@color/white"
+                android:enabled="false"/>
+
+            <Button
+                android:id="@+id/button4"
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="4"
+                android:layout_margin="10dp"
+                app:backgroundTint="@color/hat_blue"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/violet_blue"
+                android:textColor="@color/white"
+                android:enabled="false"/>
+        </LinearLayout>
+    </LinearLayout>
 
     <LinearLayout
-
         android:id="@+id/joystick_layout"
         android:layout_width="match_parent"
-        android:orientation="vertical"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="3"
+        android:orientation="vertical"
         android:gravity="center">
-        <!--Joystick-->
-
-
 
         <com.example.joystick.JoystickView
             android:id="@+id/joystickView"
@@ -141,9 +185,6 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-            <!-- Dirección -->
-
-            <!-- Coordenadas -->
             <TextView
                 android:id="@+id/directionText"
                 android:layout_width="wrap_content"
@@ -152,7 +193,7 @@
                 android:fontFamily="sans-serif-light"
                 android:text="Idle"
                 android:textColor="@color/black"
-                android:textSize="20sp" />
+                android:textSize="20sp"/>
 
             <TextView
                 android:id="@+id/coordinateText"
@@ -161,10 +202,8 @@
                 android:fontFamily="sans-serif-light"
                 android:text="X: 0.00, Y: 0.00"
                 android:textColor="@color/black"
-                android:textSize="20sp" />
-
+                android:textSize="20sp"/>
         </LinearLayout>
-
     </LinearLayout>
 
 </LinearLayout>
