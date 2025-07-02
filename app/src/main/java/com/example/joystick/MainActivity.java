@@ -247,10 +247,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
     private void setupOptionButton() {
-        setupCommandButton(button1, "1"); //opciones de los botones
-        setupCommandButton(button2, "2");
-        setupCommandButton(button3, "3");
-        setupCommandButton(button4, "4");
+        setupCommandButton(button1, "A"); //opciones de los botones
+        setupCommandButton(button2, "B");
+        setupCommandButton(button3, "C");
+        setupCommandButton(button4, "D");
     }
 
     private void setupCommandButton(Button button, String command){

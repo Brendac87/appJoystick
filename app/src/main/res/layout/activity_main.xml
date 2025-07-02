@@ -105,15 +105,21 @@
             android:id="@+id/button_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:gravity="center">
+            <LinearLayout
+                android:id="@+id/button_layout1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
 
             <Button
                 android:id="@+id/button1"
                 android:layout_width="30dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="1"
+                android:text="Evitar obstaculos"
                 android:layout_margin="10dp"
                 app:backgroundTint="@color/hat_blue"
                 app:strokeWidth="2dp"
@@ -126,7 +132,7 @@
                 android:layout_width="30dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="2"
+                android:text="Alerta"
                 android:layout_margin="10dp"
                 app:backgroundTint="@color/hat_blue"
                 app:strokeWidth="2dp"
@@ -134,32 +140,44 @@
                 android:textColor="@color/white"
                 android:enabled="false"/>
 
-            <Button
-                android:id="@+id/button3"
-                android:layout_width="30dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="3"
-                android:layout_margin="10dp"
-                app:backgroundTint="@color/hat_blue"
-                app:strokeWidth="2dp"
-                app:strokeColor="@color/violet_blue"
-                android:textColor="@color/white"
-                android:enabled="false"/>
 
-            <Button
-                android:id="@+id/button4"
-                android:layout_width="30dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="4"
-                android:layout_margin="10dp"
-                app:backgroundTint="@color/hat_blue"
-                app:strokeWidth="2dp"
-                app:strokeColor="@color/violet_blue"
-                android:textColor="@color/white"
-                android:enabled="false"/>
         </LinearLayout>
+            <LinearLayout
+                android:id="@+id/button_layout2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/button3"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Seguimiento"
+                    android:layout_margin="10dp"
+                    app:backgroundTint="@color/hat_blue"
+                    app:strokeWidth="2dp"
+                    app:strokeColor="@color/violet_blue"
+                    android:textColor="@color/white"
+                    android:enabled="false"/>
+
+                <Button
+                    android:id="@+id/button4"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Control remoto"
+                    android:layout_margin="10dp"
+                    app:backgroundTint="@color/hat_blue"
+                    app:strokeWidth="2dp"
+                    app:strokeColor="@color/violet_blue"
+                    android:textColor="@color/white"
+                    android:enabled="false"/>
+
+
+            </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout
@@ -206,4 +224,5 @@
         </LinearLayout>
     </LinearLayout>
 
+</LinearLayout>
 </LinearLayout>
