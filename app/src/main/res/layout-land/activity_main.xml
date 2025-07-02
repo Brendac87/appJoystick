@@ -62,7 +62,7 @@
             <TextView
                 android:id="@+id/deviceText"
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
+                android:layout_height="20dp"
                 android:text=""
                 android:textColor="@color/black"
 
@@ -116,7 +116,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="0dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp">
 
@@ -132,56 +132,76 @@
                     android:id="@+id/button_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:gravity="center">
 
-                    <Button
-                        android:id="@+id/button1"
-                        android:layout_width="30dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="1"
-                        android:layout_margin="10dp"
-                        app:backgroundTint="@color/hat_blue"
-                        app:strokeWidth="2dp"
-                        app:strokeColor="@color/violet_blue"
-                        android:textColor="@color/white"/>
 
-                    <Button
-                        android:id="@+id/button2"
-                        android:layout_width="30dp"
+                    <LinearLayout
+                        android:id="@+id/button_layout1"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="2"
-                        android:layout_margin="10dp"
-                        app:backgroundTint="@color/hat_blue"
-                        app:strokeWidth="2dp"
-                        app:strokeColor="@color/violet_blue"
-                        android:textColor="@color/white"/>
+                        android:orientation="horizontal"
+                        android:gravity="center">
 
-                    <Button
-                        android:id="@+id/button3"
-                        android:layout_width="30dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="3"
-                        android:layout_margin="10dp"
-                        app:backgroundTint="@color/hat_blue"
-                        app:strokeWidth="2dp"
-                        app:strokeColor="@color/violet_blue"
-                        android:textColor="@color/white"/>
+                        <Button
+                            android:id="@+id/button1"
+                            android:layout_width="30dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Evitar obstaculos"
+                            android:layout_margin="10dp"
+                            app:backgroundTint="@color/hat_blue"
+                            app:strokeWidth="2dp"
+                            app:strokeColor="@color/violet_blue"
+                            android:textColor="@color/white"/>
 
-                    <Button
-                        android:id="@+id/button4"
-                        android:layout_width="30dp"
+                        <Button
+                            android:id="@+id/button2"
+                            android:layout_width="30dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Alerta"
+                            android:layout_margin="10dp"
+                            app:backgroundTint="@color/hat_blue"
+                            app:strokeWidth="2dp"
+                            app:strokeColor="@color/violet_blue"
+                            android:textColor="@color/white"/>
+
+
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/button_layout2"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="4"
-                        android:layout_margin="10dp"
-                        app:backgroundTint="@color/hat_blue"
-                        app:strokeWidth="2dp"
-                        app:strokeColor="@color/violet_blue"
-                        android:textColor="@color/white"/>
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                        <Button
+                            android:id="@+id/button3"
+                            android:layout_width="30dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Seguimiento"
+                            android:layout_margin="10dp"
+                            app:backgroundTint="@color/hat_blue"
+                            app:strokeWidth="2dp"
+                            app:strokeColor="@color/violet_blue"
+                            android:textColor="@color/white"/>
+
+                        <Button
+                            android:id="@+id/button4"
+                            android:layout_width="30dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Control remoto"
+                            android:layout_margin="10dp"
+                            app:backgroundTint="@color/hat_blue"
+                            app:strokeWidth="2dp"
+                            app:strokeColor="@color/violet_blue"
+                            android:textColor="@color/white"/>
+
+
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
